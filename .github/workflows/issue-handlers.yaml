@@ -16,14 +16,14 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Extract issue data
-  run: |
-    requester=$(echo "${{ github.event.issue.body }}" | grep -i 'requester:' | cut -d':' -f2 | xargs)
-    env=$(echo "${{ github.event.issue.body }}" | grep -i 'env:' | cut -d':' -f2 | xargs)
-    change=$(echo "${{ github.event.issue.body }}" | grep -i 'change:' | cut -d':' -f2 | xargs)
+      run: |
+         requester=$(echo "${{ github.event.issue.body }}" | grep -i 'requester:' | cut -d':' -f2 | xargs)
+         env=$(echo "${{ github.event.issue.body }}" | grep -i 'env:' | cut -d':' -f2 | xargs)
+         change=$(echo "${{ github.event.issue.body }}" | grep -i 'change:' | cut -d':' -f2 | xargs)
 
-    echo "requester=$requester" >> $GITHUB_ENV
-    echo "env=$env" >> $GITHUB_ENV
-    echo "change=$change" >> $GITHUB_ENV
+         echo "requester=$requester" >> $GITHUB_ENV
+         echo "env=$env" >> $GITHUB_ENV
+         echo "change=$change" >> $GITHUB_ENV
 
     - name: Create a new branch
       run: |
