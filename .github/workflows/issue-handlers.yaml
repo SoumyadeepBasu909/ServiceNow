@@ -28,27 +28,34 @@ jobs:
         echo "env=$env" >> $GITHUB_ENV
         echo "change=$change" >> $GITHUB_ENV
 
+    - name: Create a new branch
+      run: |
+        BRANCH_NAME="update-from-issue-${{ github.event.issue.number }}"
+        git checkout -b $BRANCH_NAME
+        echo "branch_name=$BRANCH_NAME" >> $GITHUB_ENV
+
     - name: Modify config file
       run: |
-        echo "environment=$env" > config/env.txt
-        echo "last_updated_by=$requester" >> config/env.txt
-        echo "notes=$change" >> config/env.txt
+        mkdir -p config
+        echo "environment=${{ env.env }}" > config/env.txt
+        echo "last_updated_by=${{ env.requester }}" >> config/env.txt
+        echo "notes=${{ env.change }}" >> config/env.txt
 
     - name: Commit and push changes
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-        git checkout -b update-from-issue-${{ github.event.issue.number }}
-
         git add config/env.txt
         git commit -m "Auto update from issue #${{ github.event.issue.number }}"
-        git push origin update-from-issue-${{ github.event.issue.number }}
+        git push origin ${{ env.branch_name }}
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v6
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        base: main
+        head: ${{ env.branch_name }}
         title: "Auto PR from ServiceNow issue #${{ github.event.issue.number }}"
         body: |
           This PR was created automatically in response to issue #${{ github.event.issue.number }}.
-        branch: update-from-issue-${{ github.event.issue.number }}
