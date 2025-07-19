@@ -1,0 +1,54 @@
+name: Handle ServiceNow Issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  update-config-and-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Extract issue data
+      id: extract
+      run: |
+        echo "${{ github.event.issue.body }}" > issue.txt
+
+        requester=$(grep -i 'requester' issue.txt | cut -d':' -f2- | xargs)
+        env=$(grep -i 'environment' issue.txt | cut -d':' -f2- | xargs)
+        change=$(grep -i 'change' issue.txt | cut -d':' -f2- | xargs)
+
+        echo "requester=$requester" >> $GITHUB_ENV
+        echo "env=$env" >> $GITHUB_ENV
+        echo "change=$change" >> $GITHUB_ENV
+
+    - name: Modify config file
+      run: |
+        echo "environment=${{ env }}" > config/env.txt
+        echo "last_updated_by=${{ requester }}" >> config/env.txt
+        echo "notes=${{ change }}" >> config/env.txt
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+        git checkout -b update-from-issue-${{ github.event.issue.number }}
+
+        git add config/env.txt
+        git commit -m "Auto update from issue #${{ github.event.issue.number }}"
+        git push origin update-from-issue-${{ github.event.issue.number }}
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
+      with:
+        title: "Auto PR from ServiceNow issue #${{ github.event.issue.number }}"
+        body: |
+          This PR was created automatically in response to issue #${{ github.event.issue.number }}.
+        branch: update-from-issue-${{ github.event.issue.number }}
