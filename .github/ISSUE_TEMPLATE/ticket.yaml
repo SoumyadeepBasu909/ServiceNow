@@ -1,0 +1,24 @@
+name: ServiceNow Ticket
+description: Simulate a ServiceNow-style ticket to trigger automation
+title: "[SNOW] "
+labels: [ticket]
+body:
+  - type: input
+    id: requester
+    attributes:
+      label: Requester Name
+      description: Who is requesting this change?
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where should the change be applied?
+      options:
+        - dev
+        - staging
+        - prod
+  - type: textarea
+    id: change
+    attributes:
+      label: Requested Change
+      description: What should be changed in the configuration?
