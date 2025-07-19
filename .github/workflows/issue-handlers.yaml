@@ -50,12 +50,3 @@ jobs:
         git commit -m "Auto update from issue #${{ github.event.issue.number }}"
         git push origin ${{ env.branch_name }}
 
-    - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v6
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        base: main
-        head: ${{ env.branch_name }}
-        title: "Auto PR from ServiceNow issue #${{ github.event.issue.number }}"
-        body: |
-          This PR was created automatically in response to issue #${{ github.event.issue.number }}.
