@@ -30,9 +30,9 @@ jobs:
 
     - name: Modify config file
       run: |
-        echo "environment=${{ env }}" > config/env.txt
-        echo "last_updated_by=${{ requester }}" >> config/env.txt
-        echo "notes=${{ change }}" >> config/env.txt
+        echo "environment=$env" > config/env.txt
+        echo "last_updated_by=$requester" >> config/env.txt
+        echo "notes=$change" >> config/env.txt
 
     - name: Commit and push changes
       run: |
